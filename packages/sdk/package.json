@@ -1,0 +1,26 @@
+{
+  "name": "@prefskit/sdk",
+  "version": "0.1.0",
+  "description": "PrefsKit SDK — manage email preferences programmatically",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "keywords": ["email", "preferences", "unsubscribe", "saas"],
+  "license": "MIT",
+  "devDependencies": {
+    "@prefskit/config": "workspace:*",
+    "typescript": "^5.4.5"
+  }
+}

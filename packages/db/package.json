@@ -1,0 +1,23 @@
+{
+  "name": "@prefskit/db",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "eslint src/",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "drizzle-kit push:pg"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.30.10",
+    "postgres": "^3.4.3"
+  },
+  "devDependencies": {
+    "@prefskit/config": "workspace:*",
+    "@types/pg": "^8.11.6",
+    "drizzle-kit": "^0.21.1",
+    "typescript": "^5.4.5"
+  }
+}

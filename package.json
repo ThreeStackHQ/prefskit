@@ -1,0 +1,21 @@
+{
+  "name": "prefskit",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@8.15.0",
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "dev": "turbo run dev --parallel",
+    "clean": "turbo run clean"
+  },
+  "devDependencies": {
+    "turbo": "^1.13.3",
+    "typescript": "^5.4.5"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
