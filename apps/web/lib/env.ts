@@ -14,6 +14,10 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1, "GOOGLE_CLIENT_ID is required"),
   GOOGLE_CLIENT_SECRET: z.string().min(1, "GOOGLE_CLIENT_SECRET is required"),
 
+  // GitHub OAuth
+  GITHUB_CLIENT_ID: z.string().min(1, "GITHUB_CLIENT_ID is required"),
+  GITHUB_CLIENT_SECRET: z.string().min(1, "GITHUB_CLIENT_SECRET is required"),
+
   // Email (Resend)
   RESEND_API_KEY: z.string().min(1, "RESEND_API_KEY is required"),
 
@@ -22,6 +26,10 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z
     .string()
     .min(1, "STRIPE_WEBHOOK_SECRET is required"),
+  STRIPE_INDIE_PRICE_ID: z
+    .string()
+    .min(1, "STRIPE_INDIE_PRICE_ID is required"),
+  STRIPE_PRO_PRICE_ID: z.string().min(1, "STRIPE_PRO_PRICE_ID is required"),
 
   // PrefsKit
   PREFSKIT_TOKEN_SECRET: z

@@ -1,91 +1,151 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { PrefsPageClient } from "./prefs-client";
 
 interface PrefsPageProps {
   params: { token: string };
 }
 
-/**
- * Public email preferences page — /u/[token]
- *
- * The token is a signed JWT (using PREFSKIT_TOKEN_SECRET) that contains:
- * - sub: subscriber email
- * - wid: workspace ID
- * - exp: expiry (optional)
- *
- * This page is SSR — it validates the token server-side and renders
- * the subscriber's current preferences.
- *
- * TODO: Wire up DB lookup + token validation once auth/db is ready.
- */
+interface TokenPayload {
+  email: string;
+  workspaceId: string;
+}
 
-// Stub: simulate token validation
-async function resolveToken(_token: string) {
-  // Will call: verifyToken(token, env.PREFSKIT_TOKEN_SECRET)
-  // Returns: { email, workspaceId } or null
-  return null;
+interface WorkspaceBranding {
+  name: string;
+  logoUrl: string | null;
+  primaryColor: string;
+}
+
+interface Category {
+  id: string;
+  slug: string;
+  label: string;
+  description: string;
+  required: boolean;
+}
+
+interface SubscriberPreferences {
+  [categorySlug: string]: boolean;
+}
+
+/**
+ * Decode and verify the JWT token server-side.
+ * TODO: Replace with real jose.jwtVerify() call once PREFSKIT_TOKEN_SECRET is configured.
+ */
+async function verifyToken(token: string): Promise<TokenPayload | null> {
+  // Stub: in production, use:
+  // import { jwtVerify } from 'jose'
+  // const secret = new TextEncoder().encode(process.env.PREFSKIT_TOKEN_SECRET)
+  // const { payload } = await jwtVerify(token, secret)
+  // return { email: payload.sub as string, workspaceId: payload.wid as string }
+
+  // For now: decode without verification (DEV ONLY - replace before launch)
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(
+      Buffer.from(parts[1]!, "base64url").toString("utf-8"),
+    );
+    if (payload.exp && payload.exp < Date.now() / 1000) return null;
+    if (!payload.sub || !payload.wid) return null;
+    return { email: payload.sub as string, workspaceId: payload.wid as string };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Load workspace branding for the public preferences page.
+ * TODO: Fetch from GET /api/public/workspace/:id once Bolt's API is ready.
+ */
+async function getWorkspaceBranding(workspaceId: string): Promise<WorkspaceBranding> {
+  // Stub data
+  void workspaceId;
+  return {
+    name: "My SaaS App",
+    logoUrl: null,
+    primaryColor: "#4f46e5",
+  };
+}
+
+/**
+ * Load categories for the workspace.
+ * TODO: Fetch from GET /api/public/categories/:workspaceId once Bolt's API is ready.
+ */
+async function getCategories(workspaceId: string): Promise<Category[]> {
+  void workspaceId;
+  return [
+    {
+      id: "1",
+      slug: "marketing",
+      label: "Marketing & Announcements",
+      description: "Product launches, company news, and special offers",
+      required: false,
+    },
+    {
+      id: "2",
+      slug: "product-updates",
+      label: "Product Updates",
+      description: "New features, improvements, and changelogs",
+      required: false,
+    },
+    {
+      id: "3",
+      slug: "transactional",
+      label: "Transactional",
+      description: "Account notifications, receipts, and security alerts",
+      required: true,
+    },
+  ];
+}
+
+/**
+ * Load subscriber's current preferences.
+ * TODO: Fetch from GET /api/public/preferences/:email/:workspaceId once Bolt's API is ready.
+ */
+async function getSubscriberPreferences(
+  email: string,
+  workspaceId: string,
+): Promise<SubscriberPreferences> {
+  void email;
+  void workspaceId;
+  return {
+    marketing: true,
+    "product-updates": true,
+    transactional: true,
+  };
+}
+
+export async function generateMetadata({ params }: PrefsPageProps): Promise<Metadata> {
+  return {
+    title: "Email Preferences",
+    description: "Manage your email preferences",
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function PrefsPage({ params }: PrefsPageProps) {
   const { token } = params;
 
-  const subscriber = await resolveToken(token);
-
-  if (!subscriber) {
-    // In production: differentiate between expired vs invalid
+  const payload = await verifyToken(token);
+  if (!payload) {
     notFound();
   }
 
-  // This block is unreachable until token validation is implemented
-  // but keeps the UI structure visible for design purposes.
+  const [branding, categories, preferences] = await Promise.all([
+    getWorkspaceBranding(payload.workspaceId),
+    getCategories(payload.workspaceId),
+    getSubscriberPreferences(payload.email, payload.workspaceId),
+  ]);
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-lg space-y-6">
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Email Preferences
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Manage what emails you receive
-          </p>
-        </div>
-
-        {/* Preferences card */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm divide-y divide-gray-100">
-          {/* Category stub */}
-          {["Marketing & news", "Product updates", "Tips & tutorials"].map(
-            (category) => (
-              <div
-                key={category}
-                className="px-6 py-4 flex items-center justify-between"
-              >
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {category}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    Category description goes here
-                  </p>
-                </div>
-                {/* Toggle placeholder */}
-                <div className="w-10 h-6 bg-sky-500 rounded-full relative cursor-pointer">
-                  <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow" />
-                </div>
-              </div>
-            ),
-          )}
-        </div>
-
-        {/* Unsubscribe all */}
-        <div className="text-center">
-          <button
-            type="button"
-            className="text-sm text-gray-400 underline hover:text-gray-600 transition-colors"
-          >
-            Unsubscribe from all emails
-          </button>
-        </div>
-      </div>
-    </div>
+    <PrefsPageClient
+      token={token}
+      email={payload.email}
+      branding={branding}
+      categories={categories}
+      initialPreferences={preferences}
+    />
   );
 }

@@ -10,14 +10,15 @@
     "db:generate": "drizzle-kit generate:pg",
     "db:migrate": "drizzle-kit push:pg"
   },
-  "dependencies": {
-    "drizzle-orm": "^0.30.10",
+  "peerDependencies": {
+    "drizzle-orm": "0.30.10",
     "postgres": "^3.4.3"
   },
   "devDependencies": {
     "@prefskit/config": "workspace:*",
-    "@types/pg": "^8.11.6",
     "drizzle-kit": "^0.21.1",
+    "drizzle-orm": "0.30.10",
+    "postgres": "^3.4.3",
     "typescript": "^5.4.5"
   }
 }
