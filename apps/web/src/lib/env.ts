@@ -10,6 +10,7 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
   PREFSKIT_TOKEN_SECRET: z.string().min(32),
+  CRON_SECRET: z.string().min(32),
 });
 
 export type Env = z.infer<typeof envSchema>;
